@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: catalog-api-config
+data:
+  RabbitMq__Host: "rabbitmq"
+  Filas__PagamentoProcessado: "catalog-payment-processed"
+  Jwt__Issuer: "Fcg.Users.Api"
+  Jwt__Audience: "Fcg"

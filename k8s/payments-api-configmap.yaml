@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: payments-api-config
+data:
+  RabbitMq__Host: "rabbitmq"
+  Filas__PedidoRealizado: "payments-order-placed"
+  Pagamento__LimiteAprovacao: "200"

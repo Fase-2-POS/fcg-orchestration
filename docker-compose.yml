@@ -1,0 +1,77 @@
+services:
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: fcg-rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: fcg
+      RABBITMQ_DEFAULT_PASS: fcg123
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  users-api:
+    build: ../fcg-users-api
+    image: fcg-users-api:latest
+    container_name: fcg-users-api
+    ports:
+      - "5001:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Data Source=/app/data/users.db"
+      Jwt__Key: "RrUXKYx07AZiixhS+V6t0NTBgWfXlgtT7HhxFMQ4ewo="
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: fcg
+      RabbitMq__Password: fcg123
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  catalog-api:
+    build: ../fcg-catalog-api
+    image: fcg-catalog-api:latest
+    container_name: fcg-catalog-api
+    ports:
+      - "5002:8080"
+    environment:
+      ConnectionStrings__DefaultConnection: "Data Source=/app/data/catalog.db"
+      Jwt__Key: "RrUXKYx07AZiixhS+V6t0NTBgWfXlgtT7HhxFMQ4ewo="
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: fcg
+      RabbitMq__Password: fcg123
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  payments-api:
+    build: ../fcg-payments-api
+    image: fcg-payments-api:latest
+    container_name: fcg-payments-api
+    ports:
+      - "5003:8080"
+    environment:
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: fcg
+      RabbitMq__Password: fcg123
+      Pagamento__LimiteAprovacao: "200"
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+
+  notifications-api:
+    build: ../fcg-notifications-api
+    image: fcg-notifications-api:latest
+    container_name: fcg-notifications-api
+    ports:
+      - "5004:8080"
+    environment:
+      RabbitMq__Host: rabbitmq
+      RabbitMq__Username: fcg
+      RabbitMq__Password: fcg123
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
